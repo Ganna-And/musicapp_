@@ -4,6 +4,24 @@
 
 html, body, :root{
 height: 100%;
-background-color: rgb(1, 24, 21);
 color-scheme: dark;
 } 
+
+body{
+    background-image: url('/img/concert.jpg');
+    background-size: cover;
+    background-position: center;
+}
+@layer utilities{
+    .link{ 
+        @apply relative
+    }
+    .link::after{
+        @apply content-[''] bg-red-700 h-[3px] w-[0%] left-0 -bottom-[5px] absolute rounded-xl duration-300
+    }
+    .link:hover::after{
+        @apply w-[100%]
+    }
+   
+} 
+
