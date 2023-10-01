@@ -2,6 +2,8 @@ import Sidebar from '@/components/Sidebar'
 import './globals.css'
 import type { Metadata } from 'next'
 import { Finlandica } from 'next/font/google'
+import SupabaseProvider from '@/providers/SupabaseProvider'
+import UserProvider from '@/providers/UserProvider'
 
 const font = Finlandica({ subsets: ['latin'] })
 
@@ -18,8 +20,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={font.className}>
-        <Sidebar>{children}
-        </Sidebar></body>
+        <SupabaseProvider>
+          <UserProvider>
+        <Sidebar>
+          {children}
+        </Sidebar>
+        </UserProvider>
+        </SupabaseProvider>
+        </body>
     </html>
   )
 }
