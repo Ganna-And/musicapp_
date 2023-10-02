@@ -1,10 +1,14 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { twMerge } from "tailwind-merge";
-import { CiSearch, CiHome, CiLogin } from "react-icons/ci";
+import { CiSearch, CiHome, CiLogin, CiLogout, CiUser } from "react-icons/ci";
 import {PiSkipBackThin, PiSkipForwardLight} from "react-icons/pi"
-import AuthBtn from "./AuthBtn";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useUse } from "@/hooks/useUser";
+import toast from "react-hot-toast";
 
+import AuthBtn from "./AuthBtn";
+import useAuthModal from "@/hooks/useAuthModal";
 
 
 
@@ -15,10 +19,23 @@ interface HeaderProps {
 };
 
 const Header:React.FC<HeaderProps> = ({children, className}) => {
-    const router = useRouter();
+  
+  const authModal = useAuthModal()
+  const router = useRouter();
 
-    const handleLogOut = ()=> {
-        //future handle
+  const supabaseClient = useSupabaseClient();
+  const {user} = useUse();
+
+    const handleLogOut = async ()=> {
+        const { error} = await supabaseClient.auth.signOut();
+//reset any playing songs in the future
+        router.refresh();
+
+        if(error){
+          toast.error(error.message)
+        }else{
+          toast.success('Logged out!')
+        }
     }
 
 
@@ -99,10 +116,40 @@ const Header:React.FC<HeaderProps> = ({children, className}) => {
           </button>
         
  </div>
-        <>
-         <div><AuthBtn >LogIn<CiLogin /></AuthBtn></div>
-         </>
-         </div>
+      
+        {user ? (
+          <div
+          className="flex gap-x-4 items-center"
+          ><AuthBtn
+          onClick={handleLogOut}
+          className="text-black"
+          >
+            Logout
+          <CiLogout className='ml-1'  size={20}/>
+          </AuthBtn>
+          <button onClick={()=> router.push('/account')}
+          className=" 
+          rounded-full 
+          p-2 
+          bg-red-900
+          flex 
+          items-center 
+          justify-center 
+          cursor-pointer 
+          hover:bg-black
+          transition">
+            <CiUser size={20}/>
+          </button>
+
+          </div>
+        ): (
+          <div><AuthBtn onClick={authModal.onOpen} >
+            LogIn<CiLogin />
+          </AuthBtn></div>
+         
+        
+        )}
+         </div> 
          {children}
     </div>)
 }
